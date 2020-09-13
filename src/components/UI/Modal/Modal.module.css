@@ -18,3 +18,13 @@
     left: calc(50% - 250px);
   }
 }
+
+.Show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.Hide {
+  transform: translateY(-100vh);
+  opacity: 0;
+}
