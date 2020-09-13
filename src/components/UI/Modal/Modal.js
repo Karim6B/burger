@@ -7,7 +7,7 @@ const modal = (props) => {
   return (
     <>
       <Backdrop show={props.show} clicked={props.modalClosed} />
-      <div className={`${classes.Modal} ${style}`}>{props.children}</div>
+      <div className={[classes.Modal, style].join(" ")}>{props.children}</div>
     </>
   );
 };
