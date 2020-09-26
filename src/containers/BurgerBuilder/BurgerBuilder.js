@@ -6,6 +6,8 @@ import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import axiosOrders from '../../axios/axios-orders';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
+import * as actionTypes from '../../store/actions';
+import { connect } from 'react-redux';
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
@@ -15,20 +17,18 @@ const INGREDIENT_PRICES = {
 };
 class BurgerBuilder extends Component {
     state = {
-        ingredients: null,
-        totalPrice: 4,
         purchasable: false,
         purchasing: false,
         loading: false,
     };
 
     async componentDidMount() {
-        try {
-            const response = await axiosOrders.get('/ingredients.json');
-            this.setState({ ingredients: response.data });
-        } catch (error) {
-            console.log(error);
-        }
+        // try {
+        //     const response = await axiosOrders.get('/ingredients.json');
+        //     this.setState({ ingredients: response.data });
+        // } catch (error) {
+        //     console.log(error);
+        // }
     }
 
     updatePurchaseState = (ingredients) => {
@@ -37,39 +37,7 @@ class BurgerBuilder extends Component {
                 return ingredients[key];
             })
             .reduce((sum, el) => sum + el, 0);
-        this.setState({ purchasable: sum > 0 });
-    };
-
-    addIngredientHandler = (type) => {
-        const oldCount = this.state.ingredients[type];
-        const updatedCount = oldCount + 1;
-        const updatedIngredients = { ...this.state.ingredients };
-        updatedIngredients[type] = updatedCount;
-        const priceAddition = INGREDIENT_PRICES[type];
-        const oldPrice = this.state.totalPrice;
-        const newPrice = oldPrice + priceAddition;
-        this.setState({
-            ingredients: updatedIngredients,
-            totalPrice: newPrice,
-        });
-        this.updatePurchaseState(updatedIngredients);
-    };
-
-    removeIngredientHandler = (type) => {
-        const oldCount = this.state.ingredients[type];
-        if (oldCount > 0) {
-            const updatedCount = oldCount - 1;
-            const updatedIngredients = { ...this.state.ingredients };
-            updatedIngredients[type] = updatedCount;
-            const priceDeduction = INGREDIENT_PRICES[type];
-            const oldPrice = this.state.totalPrice;
-            const newPrice = oldPrice - priceDeduction;
-            this.setState({
-                ingredients: updatedIngredients,
-                totalPrice: newPrice,
-            });
-            this.updatePurchaseState(updatedIngredients);
-        }
+        return sum > 0;
     };
 
     purchaseHandler = () => this.setState({ purchasing: true });
@@ -79,35 +47,22 @@ class BurgerBuilder extends Component {
     };
 
     purchaseContinueHandler = async () => {
-        let queryParams = [];
-        for (let i in this.state.ingredients) {
-            queryParams.push(
-                encodeURIComponent(i) +
-                    '=' +
-                    encodeURIComponent(this.state.ingredients[i])
-            );
-        }
-        queryParams.push('price=' + this.state.totalPrice);
-        let queryParamsString = queryParams.join('&');
-        this.props.history.push({
-            pathname: '/checkout',
-            search: '?' + queryParamsString,
-        });
+        this.props.history.push('/checkout');
     };
 
     render() {
-        const disabledInfo = { ...this.state.ingredients };
+        const disabledInfo = { ...this.props.ings };
         let orderSummary = null;
 
         let burgerComponents = <Spinner />;
 
-        if (this.state.ingredients) {
+        if (this.props.ings) {
             orderSummary = (
                 <OrderSummary
-                    order={this.state.ingredients}
+                    order={this.props.ings}
                     purchaseCancel={this.purchaseCancelHandler}
                     purchaseContinue={this.purchaseContinueHandler}
-                    total={this.state.totalPrice}
+                    total={this.props.totalPrice}
                 />
             );
 
@@ -119,13 +74,13 @@ class BurgerBuilder extends Component {
                     >
                         {orderSummary}
                     </Modal>
-                    <Burger ingredients={this.state.ingredients} />
+                    <Burger ingredients={this.props.ings} />
                     <BuildControls
-                        addIngredient={this.addIngredientHandler}
-                        removeIngredient={this.removeIngredientHandler}
+                        addIngredient={this.props.addedIngredient}
+                        removeIngredient={this.props.removedIngredient}
                         disabled={disabledInfo}
-                        price={this.state.totalPrice}
-                        purchasable={this.state.purchasable}
+                        price={this.props.totalPrice}
+                        purchasable={this.updatePurchaseState(this.props.ings)}
                         ordered={this.purchaseHandler}
                     />
                 </>
@@ -139,4 +94,31 @@ class BurgerBuilder extends Component {
     }
 }
 
-export default withErrorHandler(BurgerBuilder, axiosOrders);
+const mapStateToProps = (state) => {
+    return {
+        ings: state.ingredients,
+        totalPrice: state.totalPrice,
+    };
+};
+
+const mapActionsToProps = (dispatch) => {
+    return {
+        addedIngredient: (ingName) =>
+            dispatch({
+                type: actionTypes.ADD_INGREDIENT,
+                ingredientName: ingName,
+                price: INGREDIENT_PRICES[ingName],
+            }),
+        removedIngredient: (ingName) =>
+            dispatch({
+                type: actionTypes.REMOVE_INGREDIENT,
+                ingredientName: ingName,
+                price: INGREDIENT_PRICES[ingName],
+            }),
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapActionsToProps
+)(withErrorHandler(BurgerBuilder, axiosOrders));
