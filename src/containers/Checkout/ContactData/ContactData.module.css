@@ -7,10 +7,7 @@
     padding: 10px;
     box-sizing: border-box;
 }
-.ContactData input {
-    display: block;
-    margin: 0 auto;
-}
+
 @media (min-widh: 600px) {
     .contactdata {
         width: 500px;
