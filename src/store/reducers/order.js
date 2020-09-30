@@ -1,4 +1,3 @@
-import { fetchOrders } from '../actions';
 import * as actionTypes from '../actions/actionTypes';
 import { update } from '../utility';
 
@@ -11,7 +10,6 @@ const initialState = {
 const reducer = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.PURCHASE_BURGER_SUCCESS:
-            const order = { ...action.data, id: action.id };
             return update(state, {
                 loading: false,
             });

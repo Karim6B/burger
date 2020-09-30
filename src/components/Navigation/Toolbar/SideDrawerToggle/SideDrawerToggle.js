@@ -1,5 +1,4 @@
 import React from 'react';
-import Logo from '../../../Logo/Logo';
 import classes from './SideDrawerToggle.module.css';
 
 const sideDrawerToggle = (props) => (

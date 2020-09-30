@@ -64,7 +64,6 @@ export const fetchOrders = (token, userID) => {
         const queryParams = `?auth=${token.toString()}&orderBy="userID"&equalTo="${userID.toString()}"`;
         try {
             let orders = await axiosOrders.get('/orders.json' + queryParams);
-            console.log(orders.data);
             dispatch(fetchOrdersSuccess(orders.data));
         } catch (error) {
             dispatch(fetchOrdersFail(error));

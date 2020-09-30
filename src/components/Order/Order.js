@@ -4,7 +4,10 @@ import classes from './Order.module.css';
 const Order = (props) => {
     let ingredientsArr = [];
     Object.keys(props.ingredients).map((key) => {
-        ingredientsArr.push({ name: key, amount: props.ingredients[key] });
+        return ingredientsArr.push({
+            name: key,
+            amount: props.ingredients[key],
+        });
     });
 
     const ingredientsOutput = ingredientsArr.map((el) => {
