@@ -141,7 +141,7 @@ const mapStateToProps = (state) => {
     return {
         loading: state.authReducer.loading,
         error: state.authReducer.error,
-        isAuth: state.authReducer.token,
+        isAuth: state.authReducer.token !== null,
         building: state.burgerBuilderReducer.building,
     };
 };

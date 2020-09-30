@@ -8,6 +8,7 @@ import Auth from './containers/Auth/Auth';
 import Logout from './containers/Auth/Logout/Logout';
 import * as actions from './store/actions/index';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 class App extends Component {
     componentDidMount() {
         this.props.onAuthCheck();
@@ -26,6 +27,8 @@ class App extends Component {
                     <Route path="/checkout" component={Checkout} />
                     <Route path="/orders" exact component={Orders} />
                     <Route path="/logout" exact component={Logout} />
+                    <Route path="/auth" exact component={Auth} />
+
                     <Route path="/" exact component={BurgerBuilder} />
                     <Redirect to="/" />
                 </Switch>
@@ -51,4 +54,4 @@ const mapDispatchToProps = (dispatch) => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));
